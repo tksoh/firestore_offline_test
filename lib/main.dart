@@ -87,12 +87,12 @@ class HomePageState extends State<HomePage> {
                     if (name != '' && price != null) {
                       if (action == 'create') {
                         // Persist a new product to Firestore
-                        await _productss.add({"name": name, "price": price});
+                        _productss.add({"name": name, "price": price});
                       }
 
                       if (action == 'update') {
                         // Update the product
-                        await _productss
+                        _productss
                             .doc(documentSnapshot!.id)
                             .update({"name": name, "price": price});
                       }
@@ -115,7 +115,7 @@ class HomePageState extends State<HomePage> {
 
   // Deleteing a product by id
   Future<void> _deleteProduct(String productId) async {
-    await _productss.doc(productId).delete();
+    _productss.doc(productId).delete();
 
     // Show a snackbar
     if (!mounted) return;
