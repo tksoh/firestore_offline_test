@@ -1,7 +1,9 @@
 // main.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,9 +36,32 @@ class HomePageState extends State<HomePage> {
   // text fields' controllers
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+  static late InternetConnectionChecker internetChecker;
+  static StreamSubscription<InternetConnectionStatus>? connectivitySubscription;
+  static ValueNotifier<InternetConnectionStatus> connectionStatus =
+      ValueNotifier<InternetConnectionStatus>(
+          InternetConnectionStatus.connected);
 
   final CollectionReference _productss =
       FirebaseFirestore.instance.collection('products');
+
+  @override
+  void initState() {
+    super.initState();
+    internetChecker = InternetConnectionChecker.createInstance(
+      checkTimeout: const Duration(seconds: 1),
+      checkInterval: const Duration(seconds: 1),
+    );
+    connectivitySubscription =
+        internetChecker.onStatusChange.listen(_updateConnectionStatus);
+  }
+
+  @override
+  @override
+  void dispose() {
+    super.dispose();
+    connectivitySubscription?.cancel();
+  }
 
   // This function is triggered when the floatting button or one of the edit buttons is pressed
   // Adding a product if no documentSnapshot is passed
@@ -128,6 +153,7 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kindacode.com'),
+        leading: _buildInternetIcon(),
       ),
       // Using StreamBuilder to display all products from Firestore in real-time
       body: StreamBuilder(
@@ -178,5 +204,44 @@ class HomePageState extends State<HomePage> {
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  Widget _buildInternetIcon() {
+    return ValueListenableBuilder(
+      valueListenable: connectionStatus,
+      builder: (context, value, child) {
+        switch (value) {
+          case InternetConnectionStatus.connected:
+            return const Icon(
+              Icons.wifi,
+            );
+          case InternetConnectionStatus.disconnected:
+            return const Icon(
+              Icons.signal_wifi_bad,
+            );
+          default:
+            return Container();
+        }
+      },
+    );
+  }
+
+  Future<void> _updateConnectionStatus(InternetConnectionStatus status) async {
+    connectionStatus.value = status;
+    switch (status) {
+      case InternetConnectionStatus.connected:
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Internet is connected.'),
+          backgroundColor: Colors.green,
+        ));
+
+        break;
+      case InternetConnectionStatus.disconnected:
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Internet is offline.'),
+          backgroundColor: Colors.red,
+        ));
+        break;
+    }
   }
 }
