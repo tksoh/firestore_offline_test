@@ -27,10 +27,10 @@ class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   // text fields' controllers
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
@@ -82,10 +82,9 @@ class _HomePageState extends State<HomePage> {
                 ElevatedButton(
                   child: Text(action == 'create' ? 'Create' : 'Update'),
                   onPressed: () async {
-                    final String? name = _nameController.text;
-                    final double? price =
-                        double.tryParse(_priceController.text);
-                    if (name != null && price != null) {
+                    final name = _nameController.text;
+                    final price = double.tryParse(_priceController.text);
+                    if (name != '' && price != null) {
                       if (action == 'create') {
                         // Persist a new product to Firestore
                         await _productss.add({"name": name, "price": price});
@@ -103,6 +102,7 @@ class _HomePageState extends State<HomePage> {
                       _priceController.text = '';
 
                       // Hide the bottom sheet
+                      if (!mounted) return;
                       Navigator.of(context).pop();
                     }
                   },
@@ -118,6 +118,7 @@ class _HomePageState extends State<HomePage> {
     await _productss.doc(productId).delete();
 
     // Show a snackbar
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('You have successfully deleted a product')));
   }
