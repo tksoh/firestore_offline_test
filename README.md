@@ -1,16 +1,7 @@
-# firestore_offline
+# firestore offline test
 
-A new Flutter project.
+Just a test on firestore offline mode.
 
-## Getting Started
+Based on sample code from a tutorial found on kindacode.com:
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+  https://www.kindacode.com/article/flutter-firestore-database/
